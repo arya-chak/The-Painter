@@ -3,6 +3,7 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     public float moveSpeed = 3f;
+    public JoystickController joystick; // drag JoystickBackground here in Inspector
 
     private Rigidbody2D rb;
     private Animator animator;
@@ -19,8 +20,17 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        movement.x = Input.GetAxisRaw("Horizontal");
-        movement.y = Input.GetAxisRaw("Vertical");
+        // Keyboard input (editor/testing)
+        Vector2 keyboardInput = new Vector2(
+            Input.GetAxisRaw("Horizontal"),
+            Input.GetAxisRaw("Vertical")
+        );
+
+        // Touch input from joystick
+        Vector2 joystickInput = joystick != null ? joystick.Direction : Vector2.zero;
+
+        // Use whichever has input — joystick takes priority if both active
+        movement = joystickInput.magnitude > 0.1f ? joystickInput : keyboardInput;
         movement.Normalize();
 
         if (movement != Vector2.zero)
